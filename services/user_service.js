@@ -41,9 +41,12 @@ class UserService {
             refreshToken,
         };
     }
-
+    /*
+     *Access Token: 15-30 minutes
+     *Refresh Token: 7-30 days
+     */
     static generateAccessToken(user) {
-        return jwt.sign({ id: user._id, email: user.email }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+        return jwt.sign({ id: user._id, email: user.email }, process.env.JWT_ACCESS_SECRET, { expiresIn: '1m' });
     }
 
     static generateRefreshToken(user) {

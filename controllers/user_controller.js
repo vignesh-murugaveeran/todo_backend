@@ -1,6 +1,45 @@
 const userService = require('../services/user_service');
+const jwt = require('jsonwebtoken');
 
+//is for : frontend can handle the req and res
 class UserController {
+    static async refreshToken(req, res) {
+        try {
+            const { refreshToken } = req.body;
+
+            if (!refreshToken) {
+                return res.status(401).json({
+                    status: false,
+                    message: "Refresh token required"
+                });
+            }
+
+            // VERIFY refresh token
+            const decoded = jwt.verify(
+                refreshToken,
+                process.env.JWT_REFRESH_SECRET
+            );
+
+            // generate new access token
+            const newAccessToken = jwt.sign(
+                { id: decoded.id },
+                process.env.JWT_ACCESS_SECRET,
+                { expiresIn: '1m' }
+            );
+
+            return res.status(200).json({
+                status: true,
+                accessToken: newAccessToken
+            });
+
+        } catch (err) {
+            return res.status(401).json({
+                status: false,
+                message: "Invalid or expired refresh token"
+            });
+        }
+    }
+
     static async userSignup(req, res, next) {
         try {
             const { userName, phoneNumber, email, password } = req.body;
